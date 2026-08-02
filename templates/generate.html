@@ -1,0 +1,461 @@
+{% extends "layout.html" %}
+
+{% block title %}Create a Birthday QR Surprise - QR Wishes{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<style>
+    /* Custom styles for the Generator page */
+    .generator-grid {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr;
+        gap: 30px;
+        margin-top: 20px;
+    }
+    
+    .generator-form-panel {
+        padding: 40px;
+    }
+    
+    .theme-selector-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 8px;
+    }
+    
+    .theme-card {
+        padding: 12px;
+        border-radius: 12px;
+        border: 2px solid var(--glass-border);
+        cursor: pointer;
+        text-align: center;
+        transition: var(--transition);
+        background: var(--glass-bg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .theme-card:hover {
+        transform: translateY(-2px);
+        background: var(--glass-bg-hover);
+        border-color: var(--accent-glow);
+    }
+    
+    .theme-card.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 12px var(--accent-glow);
+        background: var(--glass-bg-hover);
+    }
+    
+    .theme-dot {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .theme-card.royal-gold .theme-dot { background: linear-gradient(135deg, #ffd700, #cc9900); }
+    .theme-card.birthday-blue .theme-dot { background: linear-gradient(135deg, #00c6ff, #0072ff); }
+    .theme-card.pink-party .theme-dot { background: linear-gradient(135deg, #ff007f, #ff758c); }
+    .theme-card.dark-neon .theme-dot { background: linear-gradient(135deg, #00ffcc, #010d1a); }
+    .theme-card.cute-cartoon .theme-dot { background: linear-gradient(135deg, #ff9900, #ff5e3a); }
+    .theme-card.minimal-white .theme-dot { background: linear-gradient(135deg, #ffffff, #e6e6e6); border: 2px solid #ccc; }
+    
+    .theme-card span {
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .music-selector-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-top: 8px;
+    }
+
+    .music-card {
+        padding: 12px;
+        border-radius: 12px;
+        border: 2px solid var(--glass-border);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: var(--glass-bg);
+        transition: var(--transition);
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .music-card:hover {
+        transform: translateY(-2px);
+        background: var(--glass-bg-hover);
+    }
+
+    .music-card.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 12px var(--accent-glow);
+        background: var(--glass-bg-hover);
+    }
+
+    .music-card i {
+        font-size: 1.1rem;
+        color: var(--accent);
+    }
+
+    /* Live Preview Panel */
+    .preview-panel {
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .live-card {
+        width: 100%;
+        aspect-ratio: 3/4.2;
+        border-radius: var(--border-radius);
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        color: white;
+        text-align: center;
+        box-shadow: var(--card-shadow);
+        background-size: cover;
+        background-position: center;
+        transition: all 0.4s ease;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    /* Live Card Theme Layouts */
+    .live-card.theme-royal-gold {
+        background: linear-gradient(135deg, #1e1b15 0%, #302613 100%);
+        color: #f7e7c4;
+    }
+    .live-card.theme-royal-gold h3, .live-card.theme-royal-gold p { color: #f7e7c4; }
+    .live-card.theme-royal-gold .preview-badge { background: #cc9900; color: #111; }
+    
+    .live-card.theme-birthday-blue {
+        background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+        color: #e2f1f8;
+    }
+    .live-card.theme-birthday-blue .preview-badge { background: #0088cc; color: white; }
+
+    .live-card.theme-pink-party {
+        background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+        color: white;
+    }
+    .live-card.theme-pink-party .preview-badge { background: #ff007f; color: white; }
+
+    .live-card.theme-dark-neon {
+        background: linear-gradient(135deg, #0d0e15 0%, #171b30 100%);
+        color: #00ffcc;
+        border: 1px solid #00ffcc33;
+    }
+    .live-card.theme-dark-neon .preview-badge { background: #00ffcc; color: #0d0e15; }
+
+    .live-card.theme-cute-cartoon {
+        background: linear-gradient(135deg, #ffe066 0%, #f76b1c 100%);
+        color: #381200;
+    }
+    .live-card.theme-cute-cartoon .preview-badge { background: #ff5e3a; color: white; }
+
+    .live-card.theme-minimal-white {
+        background: #ffffff;
+        color: #2c3e50;
+        border: 1px solid #ddd;
+    }
+    .live-card.theme-minimal-white h3, .live-card.theme-minimal-white p { color: #2c3e50; }
+    .live-card.theme-minimal-white .preview-badge { background: #111111; color: white; }
+
+    .preview-badge {
+        font-size: 0.75rem;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-weight: 700;
+        align-self: center;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+    }
+
+    .preview-frame {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        border: 3px solid rgba(255,255,255,0.4);
+        margin: 15px auto;
+        overflow: hidden;
+        background: rgba(255,255,255,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .preview-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .preview-msg {
+        font-size: 0.9rem;
+        font-style: italic;
+        line-height: 1.5;
+        overflow-y: auto;
+        max-height: 110px;
+        padding: 0 10px;
+    }
+
+    .upload-dragzone {
+        border: 2px dashed var(--glass-border);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        text-align: center;
+        cursor: pointer;
+        transition: var(--transition);
+        background: var(--glass-bg);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .upload-dragzone:hover {
+        border-color: var(--accent);
+        background: var(--glass-bg-hover);
+    }
+
+    .upload-preview-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-top: 10px;
+    }
+
+    .upload-thumbnail {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid var(--glass-border);
+    }
+
+    /* File inputs styled trigger button */
+    .file-input-wrapper {
+        position: relative;
+    }
+    
+    .file-input-wrapper input[type="file"] {
+        position: absolute;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+    }
+
+    @media (max-width: 900px) {
+        .generator-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .preview-panel {
+            position: relative;
+            top: 0;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="section-header slide-up">
+    <h1 class="section-title">Design a QR Birthday Surprise</h1>
+    <p class="section-subtitle">Fill out the customization form below to design a birthday surprise page. When finished, we will construct a unique QR code you can print or attach directly!</p>
+</div>
+
+<div class="generator-grid slide-up">
+    <!-- Form Configuration Panel -->
+    <div class="glass-container generator-form-panel">
+        <form id="generator-form" enctype="multipart/form-data">
+            <!-- Names row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="form-group">
+                    <label for="friend-name">Friend's Name <span style="color: var(--error);">*</span></label>
+                    <input type="text" id="friend-name" name="friend_name" class="form-control" placeholder="e.g. Alex" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="sender-name">Your Name (Sender) <span style="color: var(--error);">*</span></label>
+                    <input type="text" id="sender-name" name="sender_name" class="form-control" placeholder="e.g. Sarah" required>
+                </div>
+            </div>
+
+            <!-- Date & Age row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                <div class="form-group">
+                    <label for="birthday-date">Birthday Date</label>
+                    <input type="date" id="birthday-date" name="birthday_date" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="age">Age Reaching</label>
+                    <input type="number" id="age" name="age" class="form-control" placeholder="e.g. 25" min="1" max="150">
+                </div>
+            </div>
+
+            <!-- Message with Random Quote -->
+            <div class="form-group" style="margin-top: 15px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label for="birthday-message">Birthday Message <span style="color: var(--error);">*</span></label>
+                    <button type="button" class="btn btn-secondary" id="btn-random-quote" style="padding: 4px 10px; font-size: 0.75rem; border-radius: 8px;">
+                        <i class="fa-solid fa-wand-magic"></i> Suggest Quote
+                    </button>
+                </div>
+                <textarea id="birthday-message" name="message" class="form-control" placeholder="Write your heartfelt message here..." max-length="500" required></textarea>
+                <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">
+                    <span id="char-counter">0 / 500 characters</span>
+                    <span>Max 500 characters</span>
+                </div>
+            </div>
+
+            <!-- Photo Upload Row -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                <div class="form-group">
+                    <label>Friend's Photo</label>
+                    <div class="upload-dragzone file-input-wrapper">
+                        <i class="fa-solid fa-image" style="font-size: 1.5rem; color: var(--accent);"></i>
+                        <p style="font-size: 0.75rem; font-weight: 500;">Select Photo</p>
+                        <input type="file" id="friend-photo-input" name="photo" accept="image/*">
+                    </div>
+                    <div id="friend-photo-preview-container" class="upload-preview-container" style="display: none;">
+                        <img id="friend-photo-preview" src="#" class="upload-thumbnail" alt="Friend Thumbnail">
+                        <button type="button" class="btn btn-secondary" id="btn-remove-photo" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; color: var(--error);">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Card Background</label>
+                    <div class="upload-dragzone file-input-wrapper">
+                        <i class="fa-solid fa-panorama" style="font-size: 1.5rem; color: var(--accent);"></i>
+                        <p style="font-size: 0.75rem; font-weight: 500;">Select Image</p>
+                        <input type="file" id="bg-photo-input" name="background" accept="image/*">
+                    </div>
+                    <div id="bg-photo-preview-container" class="upload-preview-container" style="display: none;">
+                        <img id="bg-photo-preview" src="#" class="upload-thumbnail" alt="Background Thumbnail">
+                        <button type="button" class="btn btn-secondary" id="btn-remove-bg" style="padding: 4px 8px; font-size: 0.75rem; border-radius: 6px; color: var(--error);">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Theme Picker -->
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Select Theme Color Palette</label>
+                <div class="theme-selector-grid">
+                    <div class="theme-card active royal-gold" data-theme="royal-gold">
+                        <div class="theme-dot"></div>
+                        <span>Royal Gold</span>
+                    </div>
+                    <div class="theme-card birthday-blue" data-theme="birthday-blue">
+                        <div class="theme-dot"></div>
+                        <span>Blue Party</span>
+                    </div>
+                    <div class="theme-card pink-party" data-theme="pink-party">
+                        <div class="theme-dot"></div>
+                        <span>Pink Cake</span>
+                    </div>
+                    <div class="theme-card dark-neon" data-theme="dark-neon">
+                        <div class="theme-dot"></div>
+                        <span>Dark Neon</span>
+                    </div>
+                    <div class="theme-card cute-cartoon" data-theme="cute-cartoon">
+                        <div class="theme-dot"></div>
+                        <span>Cute Comic</span>
+                    </div>
+                    <div class="theme-card minimal-white" data-theme="minimal-white">
+                        <div class="theme-dot"></div>
+                        <span>Minimalist</span>
+                    </div>
+                </div>
+                <!-- Hidden Theme input -->
+                <input type="hidden" id="selected-theme" name="theme" value="royal-gold">
+            </div>
+
+            <!-- Music Picker -->
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Select Celebration Soundtrack</label>
+                <div class="music-selector-grid">
+                    <div class="music-card active" data-music="happy-birthday">
+                        <i class="fa-solid fa-music"></i>
+                        <span>Happy Birthday</span>
+                    </div>
+                    <div class="music-card" data-music="instrumental">
+                        <i class="fa-solid fa-guitar"></i>
+                        <span>Instrumental</span>
+                    </div>
+                    <div class="music-card" data-music="piano">
+                        <i class="fa-solid fa-keyboard"></i>
+                        <span>Piano Solitude</span>
+                    </div>
+                    <div class="music-card" data-music="none">
+                        <i class="fa-solid fa-volume-xmark"></i>
+                        <span>No Music</span>
+                    </div>
+                </div>
+                <!-- Hidden Music input -->
+                <input type="hidden" id="selected-music" name="music" value="happy-birthday">
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btn-generate-wish" style="margin-top: 30px; width: 100%; height: 50px;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate QR Code & Link
+            </button>
+        </form>
+    </div>
+
+    <!-- Live Preview Panel -->
+    <div class="preview-panel">
+        <h3 style="font-weight: 700; text-align: left;"><i class="fa-solid fa-eye"></i> Live card preview</h3>
+        
+        <div class="live-card theme-royal-gold" id="live-card-preview">
+            <div class="preview-badge" id="preview-theme-badge">Royal Gold</div>
+            
+            <div>
+                <div class="preview-frame">
+                    <img id="preview-photo" src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&width=200&auto=format&fit=crop" alt="Birthday Friend">
+                </div>
+                
+                <h3 id="preview-heading" style="font-weight: 800; font-size: 1.4rem; margin-top: 10px;">Happy Birthday, Friend!</h3>
+                <h4 id="preview-age" style="font-weight: 600; font-size: 1.1rem; opacity: 0.9; display: none;">Turning 25</h4>
+            </div>
+            
+            <p class="preview-msg" id="preview-msg-text">
+                Your greeting message will appear here in real-time. Choose a cute theme and upload custom images to customize this card!
+            </p>
+            
+            <div style="font-size: 0.85rem; font-weight: 500; opacity: 0.8; margin-top: 10px;">
+                With Love, <span id="preview-sender">Sarah</span>
+            </div>
+        </div>
+        
+        <p style="font-size: 0.8rem; color: var(--text-secondary); font-style: italic;">
+            * This is a mockup preview. The final page accessed via QR code has fullscreen animated particles, interactive effects, countdowns, and sound.
+        </p>
+    </div>
+</div>
+{% endblock %}

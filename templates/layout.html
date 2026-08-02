@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}QR Wishes - Surprise Birthday Cards{% endblock %}</title>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Global Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Page Loader -->
+    <div class="loader-wrapper" id="page-loader">
+        <div class="loader"></div>
+        <div class="loader-text">Loading Sweet Surprises...</div>
+    </div>
+
+    <!-- Navigation Header -->
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}" class="nav-brand">
+            <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent);"></i>
+            <span>QR Wishes</span>
+        </a>
+        
+        <button class="burger-menu" id="burger-btn" aria-label="Toggle Menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+        <ul class="nav-links" id="nav-links">
+            <li class="{% if request.endpoint == 'index' %}active{% endif %}"><a href="{{ url_for('index') }}">Home</a></li>
+            <li class="{% if request.endpoint == 'generate' %}active{% endif %}"><a href="{{ url_for('generate') }}">Generate Wish</a></li>
+            <li class="{% if request.endpoint == 'contact' %}active{% endif %}"><a href="{{ url_for('contact') }}">Contact</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <button class="theme-btn" id="theme-toggle" aria-label="Toggle Dark Mode">
+                <i class="fa-solid fa-moon"></i>
+            </button>
+            <a href="{{ url_for('generate') }}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create</a>
+        </div>
+    </nav>
+
+    <!-- Main Dynamic Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2026 QR Wishes. Crafted with <i class="fa-solid fa-heart" style="color: #ef4444;"></i> to spread birthday smiles.</p>
+            <div class="footer-links">
+                <a href="{{ url_for('contact') }}">Contact Us</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Toast Notifications Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

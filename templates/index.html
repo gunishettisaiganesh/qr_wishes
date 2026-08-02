@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+
+{% block title %}QR Wishes - Turn Birthday Wishes into QR Surprises{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="hero-section slide-up">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <i class="fa-solid fa-sparkles"></i> The Future of Birthday Cards
+        </div>
+        <h1 class="hero-title">
+            Create Beautiful Birthday Wishes with <span>QR Codes</span>
+        </h1>
+        <p class="hero-description">
+            QR Wishes lets you craft deeply personalized digital birthday greetings, bundle them into a stunning themed web page, and pack them behind a dynamic QR code. Print the QR on physical cards, gifts, or tags for a beautiful digital surprise scan!
+        </p>
+        <div class="hero-cta">
+            <a href="{{ url_for('generate') }}" class="btn btn-primary">
+                <i class="fa-solid fa-qrcode"></i> Generate QR Wish
+            </a>
+        </div>
+    </div>
+    
+    <div class="hero-illustration">
+        <div class="illustration-box animate-float">
+            <!-- Glassmorphism Birthday Graphic Card inside Hero -->
+            <div class="glass-container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 30px; width: 220px; text-align: center; border-radius: var(--border-radius); z-index: 10;">
+                <i class="fa-solid fa-cake-candles" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 15px;"></i>
+                <h4 style="font-weight: 700; margin-bottom: 5px;">Happy Birthday!</h4>
+                <p style="font-size: 0.8rem; color: var(--text-secondary);">Scan for surprise</p>
+                <div style="margin-top: 15px; border: 2px dashed var(--accent); padding: 5px; border-radius: 8px; display: inline-block; background: white;">
+                    <i class="fa-solid fa-qrcode" style="font-size: 3rem; color: #1e293b;"></i>
+                </div>
+            </div>
+            
+            <!-- Animated Floating Balloons -->
+            <div class="floating-balloon-container">
+                <div class="balloon-graphic balloon-1">
+                    <div class="balloon-string"></div>
+                </div>
+                <div class="balloon-graphic balloon-2">
+                    <div class="balloon-string"></div>
+                </div>
+                <div class="balloon-graphic balloon-3">
+                    <div class="balloon-string"></div>
+                </div>
+                <div class="balloon-graphic balloon-4">
+                    <div class="balloon-string"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<section class="features-section fade-in">
+    <div class="section-header">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">Create a memorable digital birthday gift in just three simple steps.</p>
+    </div>
+    
+    <div class="features-grid">
+        <!-- Step 1 -->
+        <div class="feature-card glass-container">
+            <div class="feature-icon-wrapper">
+                <i class="fa-solid fa-pen-fancy"></i>
+            </div>
+            <h3>1. Create & Customize</h3>
+            <p>Fill out details: names, age, and a warm birthday message. Personalize the look with high-definition photos, custom backgrounds, responsive themes, and background soundtracks.</p>
+        </div>
+        
+        <!-- Step 2 -->
+        <div class="feature-card glass-container">
+            <div class="feature-icon-wrapper">
+                <i class="fa-solid fa-qrcode"></i>
+            </div>
+            <h3>2. Generate The QR</h3>
+            <p>Our generator builds a unique URL ID and customizes a QR code designed to complement your birthday theme. Download the QR or copy the direct gift link immediately.</p>
+        </div>
+        
+        <!-- Step 3 -->
+        <div class="feature-card glass-container">
+            <div class="feature-icon-wrapper">
+                <i class="fa-solid fa-gift"></i>
+            </div>
+            <h3>3. Gift The Surprise</h3>
+            <p>Print the QR onto a greeting card, wrap it into a gift box, or send it directly. When your friend scans it with their camera, they unlock a festive birthday party screen with music, balloons, and cake!</p>
+        </div>
+    </div>
+</section>
+
+<!-- QR Code Scanner Feature -->
+<section class="scanner-section fade-in">
+    <div class="section-header">
+        <h2 class="section-title">Scanner Preview</h2>
+        <p class="section-subtitle">Got a printed QR Wish in front of you? Scan it here using your device's camera or upload the QR image to open the surprise birthday page instantly.</p>
+    </div>
+    
+    <div class="scanner-box glass-container">
+        <div class="scanner-preview" id="scanner-preview">
+            <div id="scanner-placeholder-content">
+                <i class="fa-solid fa-camera scanner-placeholder-icon"></i>
+                <p style="font-weight: 500;">Camera Scanner Interface</p>
+                <p style="font-size: 0.8rem; padding: 0 20px; margin-top: 5px;">Requires camera access or QR image upload to function</p>
+            </div>
+            <div id="reader" style="display: none;"></div>
+        </div>
+        
+        <div style="display: flex; gap: 15px; width: 100%;">
+            <button class="btn btn-primary" id="btn-start-scan" style="flex: 1;">
+                <i class="fa-solid fa-play"></i> Start Camera Scan
+            </button>
+            <button class="btn btn-secondary" id="btn-stop-scan" style="flex: 1; display: none;">
+                <i class="fa-solid fa-stop"></i> Stop Camera
+            </button>
+            <label class="btn btn-secondary" style="flex: 1; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                <i class="fa-solid fa-upload"></i> Upload Image
+                <input type="file" id="qr-file-input" accept="image/*" style="display: none;">
+            </label>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<!-- HTML5-QRCODE Library for QR scanning -->
+<script src="https://unpkg.com/html5-qrcode" defer></script>
+{% endblock %}

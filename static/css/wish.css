@@ -1,0 +1,421 @@
+/* Wish Page - Themed Surprises stylesheet */
+
+.wish-body {
+    background-attachment: fixed;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Music floating trigger button */
+.music-toggle-container {
+    position: fixed;
+    top: 25px;
+    right: 25px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.music-btn-floating {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.3rem;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    transition: var(--transition);
+}
+
+.music-btn-floating:hover {
+    transform: scale(1.1) rotate(15deg);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.music-btn-floating.playing i {
+    animation: music-pulse 1.2s infinite linear;
+}
+
+@keyframes music-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); color: #ec4899; }
+}
+
+/* Canvas overlays for animations */
+#confetti-canvas, #fireworks-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* Interactive Gift Box container */
+.gift-wrapper {
+    position: relative;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.gift-box {
+    width: 160px;
+    height: 160px;
+    position: relative;
+    cursor: pointer;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+}
+
+.gift-box:hover {
+    animation: gift-shake 0.6s infinite ease-in-out;
+}
+
+@keyframes gift-shake {
+    0%, 100% { transform: rotate(0deg); }
+    20%, 60% { transform: rotate(-8deg); }
+    40%, 80% { transform: rotate(8deg); }
+}
+
+/* 2D/3D CSS Gift Box visual structure */
+.gift-lid {
+    position: absolute;
+    width: 170px;
+    height: 35px;
+    background: #ef4444;
+    border-radius: 4px;
+    top: 0;
+    left: -5px;
+    z-index: 2;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.gift-lid::after {
+    content: '';
+    position: absolute;
+    width: 25px;
+    height: 100%;
+    background: #ffd700;
+    left: 72px;
+}
+
+.gift-ribbon-bow {
+    position: absolute;
+    top: -25px;
+    left: 60px;
+    width: 50px;
+    height: 25px;
+    z-index: 3;
+    transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.gift-ribbon-bow::before, .gift-ribbon-bow::after {
+    content: '';
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border: 5px solid #ffd700;
+    border-radius: 50% 50% 0 50%;
+    transform: rotate(-45deg);
+}
+
+.gift-ribbon-bow::after {
+    left: 20px;
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(45deg);
+}
+
+.gift-container-box {
+    position: absolute;
+    width: 160px;
+    height: 130px;
+    background: #dc2626;
+    bottom: 0;
+    border-radius: 0 0 6px 6px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+}
+
+.gift-container-box::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 100%;
+    background: #ffd700;
+    left: 70px;
+}
+
+/* Open Animation triggers */
+.gift-wrapper.open .gift-lid {
+    transform: translateY(-80px) rotate(-15deg);
+    opacity: 0;
+}
+
+.gift-wrapper.open .gift-ribbon-bow {
+    transform: translateY(-90px) rotate(-20deg);
+    opacity: 0;
+}
+
+.gift-wrapper.open .gift-box {
+    transform: scale(0.3);
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Birthday Wish Card container */
+.surprise-card-wrapper {
+    max-width: 520px;
+    width: 100%;
+    position: relative;
+    z-index: 10;
+    transform: scale(0.6);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.surprise-card-wrapper.show {
+    transform: scale(1);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.surprise-card {
+    border-radius: 24px;
+    padding: 40px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.15);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+    background-size: cover;
+    background-position: center;
+}
+
+/* Friend Photo Polaroid Frame style */
+.polaroid-frame {
+    background: white;
+    padding: 15px 15px 30px 15px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    transform: rotate(-3deg);
+    width: 220px;
+    align-self: center;
+    transition: var(--transition);
+}
+
+.polaroid-frame:hover {
+    transform: rotate(0deg) scale(1.05);
+}
+
+.polaroid-frame img {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border: 1px solid #eee;
+}
+
+.polaroid-frame .caption {
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #333;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Cake & Candles animation */
+.cake-graphic {
+    font-size: 3rem;
+    position: relative;
+    margin-bottom: 10px;
+    animation: bounce-cake 2s infinite ease-in-out;
+}
+
+@keyframes bounce-cake {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+
+/* Ticker Countdown */
+.celebration-countdown {
+    background: rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.countdown-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.countdown-number {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.countdown-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    opacity: 0.8;
+}
+
+/* Custom visual style variables for Birthday wish templates */
+/* 1. BLUE THEME */
+.theme-birthday-blue {
+    background: linear-gradient(135deg, #091220 0%, #0d1e36 50%, #152d50 100%);
+    color: #f0f7ff;
+}
+.theme-birthday-blue .surprise-card {
+    background-color: rgba(13, 30, 54, 0.7);
+    border-color: rgba(0, 210, 255, 0.2);
+}
+.theme-birthday-blue h1 {
+    color: #00d2ff;
+    text-shadow: 0 0 15px rgba(0,210,255,0.5);
+}
+
+/* 2. PINK PARTY */
+.theme-pink-party {
+    background: linear-gradient(135deg, #2a0815 0%, #461126 50%, #681c3c 100%);
+    color: #fff0f5;
+}
+.theme-pink-party .surprise-card {
+    background-color: rgba(70, 17, 38, 0.7);
+    border-color: rgba(255, 51, 136, 0.25);
+}
+.theme-pink-party h1 {
+    color: #ff3388;
+    text-shadow: 0 0 15px rgba(255,51,136,0.5);
+}
+
+/* 3. ROYAL GOLD */
+.theme-royal-gold {
+    background: linear-gradient(135deg, #0a0a0a 0%, #17171a 50%, #202024 100%);
+    color: #f7e7c4;
+}
+.theme-royal-gold .surprise-card {
+    background-color: rgba(23, 23, 26, 0.8);
+    border-color: rgba(204, 153, 0, 0.25);
+}
+.theme-royal-gold h1 {
+    color: #cc9900;
+    text-shadow: 0 0 15px rgba(204,153,0,0.4);
+}
+
+/* 4. DARK NEON */
+.theme-dark-neon {
+    background: linear-gradient(135deg, #030308 0%, #080a14 50%, #0d1226 100%);
+    color: #e5f9f6;
+}
+.theme-dark-neon .surprise-card {
+    background-color: rgba(8, 10, 20, 0.8);
+    border-color: rgba(0, 255, 204, 0.2);
+}
+.theme-dark-neon h1 {
+    color: #00ffcc;
+    text-shadow: 0 0 20px rgba(0,255,204,0.6);
+}
+
+/* 5. CUTE CARTOON */
+.theme-cute-cartoon {
+    background: linear-gradient(135deg, #ffd3b6 0%, #ffaaa5 50%, #ff8b94 100%);
+    color: #4a1900;
+}
+.theme-cute-cartoon .surprise-card {
+    background-color: rgba(255, 255, 255, 0.85);
+    border: 3px solid #000;
+    box-shadow: 10px 10px 0 #000;
+    color: #333;
+}
+.theme-cute-cartoon .polaroid-frame {
+    border: 3px solid #000;
+    box-shadow: 6px 6px 0 #000;
+    transform: rotate(-1deg);
+}
+.theme-cute-cartoon h1 {
+    color: #d13000;
+    font-weight: 800;
+}
+.theme-cute-cartoon .celebration-countdown {
+    background: #fff;
+    border: 3px solid #000;
+    color: #333;
+    box-shadow: 4px 4px 0 #000;
+}
+
+/* 6. MINIMAL WHITE */
+.theme-minimal-white {
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+    color: #1e293b;
+}
+.theme-minimal-white .surprise-card {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #1e293b;
+}
+.theme-minimal-white h1 {
+    color: #1e293b;
+}
+.theme-minimal-white .celebration-countdown {
+    background: rgba(0,0,0,0.03);
+    border-color: rgba(0,0,0,0.05);
+    color: #1e293b;
+}
+
+/* Interactive elements */
+.wish-message {
+    font-size: 1.15rem;
+    line-height: 1.6;
+    font-style: italic;
+    opacity: 0.95;
+    padding: 0 10px;
+}
+
+.wish-sender {
+    font-weight: 600;
+    font-size: 1.05rem;
+}
+
+/* Floating Particles (Sparkles CSS) */
+.sparkle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: white;
+    border-radius: 50%;
+    opacity: 0;
+    animation: sparkle-float 4s infinite linear;
+}
+
+@keyframes sparkle-float {
+    0% { transform: translateY(100vh) scale(0); opacity: 0; }
+    50% { opacity: 0.7; }
+    100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
+}
