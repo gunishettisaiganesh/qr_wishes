@@ -9,9 +9,9 @@
     <!-- Poppins Font -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap">
     <!-- Global CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=1.0.2">
     <!-- Wish CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/wish.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/wish.css') }}?v=1.0.2">
 </head>
 <body class="wish-body theme-{{ wish.theme }}" {% if wish.background %} style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('{{ wish.background }}'); background-size: cover; background-position: center;" {% endif %}>
     
