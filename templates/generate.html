@@ -189,22 +189,26 @@
     }
 
     .preview-frame {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        border: 3px solid rgba(255,255,255,0.4);
-        margin: 15px auto;
-        overflow: hidden;
-        background: rgba(255,255,255,0.1);
+        background: white;
+        padding: 6px 6px 14px 6px;
+        border-radius: 6px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        transform: rotate(-2deg);
+        width: 110px;
+        margin: 12px auto;
+        align-self: center;
+        transition: var(--transition);
         display: flex;
-        align-items: center;
-        justify-content: center;
+        flex-direction: column;
+        gap: 4px;
+        border: 1px solid rgba(0,0,0,0.05);
     }
 
     .preview-frame img {
         width: 100%;
-        height: 100%;
+        aspect-ratio: 1;
         object-fit: cover;
+        border: 1px solid #eee;
     }
 
     .preview-msg {
@@ -265,6 +269,16 @@
         cursor: pointer;
     }
 
+    .form-row-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    
+    .form-row-grid-margin {
+        margin-top: 15px;
+    }
+
     @media (max-width: 900px) {
         .generator-grid {
             grid-template-columns: 1fr;
@@ -275,6 +289,24 @@
             top: 0;
             max-width: 400px;
             margin: 0 auto;
+        }
+    }
+
+    @media (max-width: 600px) {
+        .generator-form-panel {
+            padding: 24px 16px;
+        }
+        .form-row-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+        }
+        .theme-selector-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .music-selector-grid {
+            grid-template-columns: 1fr;
+            gap: 8px;
         }
     }
 </style>
@@ -291,7 +323,7 @@
     <div class="glass-container generator-form-panel">
         <form id="generator-form" enctype="multipart/form-data">
             <!-- Names row -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="form-row-grid">
                 <div class="form-group">
                     <label for="friend-name">Friend's Name <span style="color: var(--error);">*</span></label>
                     <input type="text" id="friend-name" name="friend_name" class="form-control" placeholder="e.g. Alex" required>
@@ -304,7 +336,7 @@
             </div>
 
             <!-- Date & Age row -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+            <div class="form-row-grid form-row-grid-margin">
                 <div class="form-group">
                     <label for="birthday-date">Birthday Date</label>
                     <input type="date" id="birthday-date" name="birthday_date" class="form-control">
@@ -332,7 +364,7 @@
             </div>
 
             <!-- Photo Upload Row -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+            <div class="form-row-grid form-row-grid-margin">
                 <div class="form-group">
                     <label>Friend's Photo</label>
                     <div class="upload-dragzone file-input-wrapper">
