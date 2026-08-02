@@ -52,13 +52,16 @@ def upload_to_catbox(file_io, filename):
         response = requests.post(
             'https://catbox.moe/user/api.php',
             data={'reqtype': 'fileupload'},
-            files={'fileToUpload': (filename, file_io.read())}
+            files={'fileToUpload': (filename, file_io.read())},
+            timeout=15
         )
         if response.status_code == 200:
-            return response.text.strip()
+            return response.text.strip(), None
+        else:
+            return None, f"HTTP {response.status_code}: {response.text}"
     except Exception as e:
         print(f"Error uploading to catbox: {e}")
-    return None
+        return None, str(e)
 
 # Base64 Encoding & Decoding Helpers
 def encode_data(payload):
@@ -142,9 +145,9 @@ def api_generate():
                     img_io.seek(0)
                     
                     # Upload to Catbox
-                    uploaded_url = upload_to_catbox(img_io, filename)
+                    uploaded_url, upload_err = upload_to_catbox(img_io, filename)
                     if not uploaded_url:
-                        return jsonify({'success': False, 'error': 'Failed to upload friend photo to remote storage.'}), 500
+                        return jsonify({'success': False, 'error': f'Failed to upload friend photo to remote storage: {upload_err}'}), 500
                     friend_photo_path = uploaded_url
                 except Exception as e:
                     return jsonify({'success': False, 'error': f'Failed to process friend photo: {str(e)}'}), 500
@@ -177,9 +180,9 @@ def api_generate():
                     img_io.seek(0)
                     
                     # Upload to Catbox
-                    uploaded_url = upload_to_catbox(img_io, filename)
+                    uploaded_url, upload_err = upload_to_catbox(img_io, filename)
                     if not uploaded_url:
-                        return jsonify({'success': False, 'error': 'Failed to upload background photo to remote storage.'}), 500
+                        return jsonify({'success': False, 'error': f'Failed to upload background photo to remote storage: {upload_err}'}), 500
                     bg_photo_path = uploaded_url
                 except Exception as e:
                     return jsonify({'success': False, 'error': f'Failed to process background photo: {str(e)}'}), 500
