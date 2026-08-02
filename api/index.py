@@ -51,7 +51,7 @@ def upload_to_telegraph(file_io, filename):
     try:
         response = requests.post(
             'https://telegra.ph/upload',
-            files={'file': (filename, file_io.read())},
+            files={'file': (filename, file_io.read(), 'image/jpeg')},
             timeout=15
         )
         if response.status_code == 200:
