@@ -49,10 +49,14 @@ def allowed_file(filename):
 # Helper to upload file to Catbox.moe
 def upload_to_catbox(file_io, filename):
     try:
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
         response = requests.post(
             'https://catbox.moe/user/api.php',
             data={'reqtype': 'fileupload'},
             files={'fileToUpload': (filename, file_io.read())},
+            headers=headers,
             timeout=15
         )
         if response.status_code == 200:
