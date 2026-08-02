@@ -1,0 +1,19 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# Vercel
+.vercel
+
+# Project specific
+static/uploads/*
+!static/uploads/.gitkeep
+test_bg.jpg
+test_friend.jpg

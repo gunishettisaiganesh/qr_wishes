@@ -3,27 +3,45 @@ import uuid
 import base64
 import json
 import io
+import requests
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, send_from_directory, send_file
+from flask import Flask, render_template, request, jsonify, send_from_directory, send_file, redirect, url_for
 from werkzeug.utils import secure_filename
 import qrcode
 from PIL import Image
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder='../templates', static_folder='../static')
 
-# Configurations
-UPLOAD_FOLDER = os.path.join(app.root_path, 'static', 'uploads')
+# Configurations (for fallback/reference)
+UPLOAD_FOLDER = os.path.join(app.root_path, '..', 'static', 'uploads')
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB Max upload size
 
-# Create directories if they do not exist
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+# Create directories if they do not exist (wrapped in try-except for read-only Vercel environment)
+try:
+    os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+except Exception as e:
+    print(f"Warning: Could not create upload folder (read-only filesystem on Vercel): {e}")
 
 # Helper function to check file type
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# Helper to upload file to Catbox.moe
+def upload_to_catbox(file_io, filename):
+    try:
+        response = requests.post(
+            'https://catbox.moe/user/api.php',
+            data={'reqtype': 'fileupload'},
+            files={'fileToUpload': (filename, file_io.read())}
+        )
+        if response.status_code == 200:
+            return response.text.strip()
+    except Exception as e:
+        print(f"Error uploading to catbox: {e}")
+    return None
 
 # Base64 Encoding & Decoding Helpers
 def encode_data(payload):
@@ -87,7 +105,6 @@ def api_generate():
                 filename = secure_filename(f"{file_hash}_friend_{friend_photo.filename}")
                 filename_base, _ = os.path.splitext(filename)
                 filename = f"{filename_base}.jpg"
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 
                 try:
                     img = Image.open(friend_photo.stream)
@@ -102,9 +119,16 @@ def api_generate():
                     # Resize preserving aspect ratio (limit to max 600px width/height)
                     img.thumbnail((600, 600), Image.Resampling.LANCZOS)
                     
-                    # Save as compressed JPEG
-                    img.save(file_path, 'JPEG', quality=85)
-                    friend_photo_path = f"/static/uploads/{filename}"
+                    # Save as compressed JPEG in memory
+                    img_io = io.BytesIO()
+                    img.save(img_io, 'JPEG', quality=85)
+                    img_io.seek(0)
+                    
+                    # Upload to Catbox
+                    uploaded_url = upload_to_catbox(img_io, filename)
+                    if not uploaded_url:
+                        return jsonify({'success': False, 'error': 'Failed to upload friend photo to remote storage.'}), 500
+                    friend_photo_path = uploaded_url
                 except Exception as e:
                     return jsonify({'success': False, 'error': f'Failed to process friend photo: {str(e)}'}), 500
             else:
@@ -116,7 +140,6 @@ def api_generate():
                 filename = secure_filename(f"{file_hash}_bg_{bg_photo.filename}")
                 filename_base, _ = os.path.splitext(filename)
                 filename = f"{filename_base}.jpg"
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
                 
                 try:
                     img = Image.open(bg_photo.stream)
@@ -131,9 +154,16 @@ def api_generate():
                     # Resize: limit dimensions to maximum of 1200px maintaining aspect ratio
                     img.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
                     
-                    # Save as compressed JPEG
-                    img.save(file_path, 'JPEG', quality=85)
-                    bg_photo_path = f"/static/uploads/{filename}"
+                    # Save as compressed JPEG in memory
+                    img_io = io.BytesIO()
+                    img.save(img_io, 'JPEG', quality=85)
+                    img_io.seek(0)
+                    
+                    # Upload to Catbox
+                    uploaded_url = upload_to_catbox(img_io, filename)
+                    if not uploaded_url:
+                        return jsonify({'success': False, 'error': 'Failed to upload background photo to remote storage.'}), 500
+                    bg_photo_path = uploaded_url
                 except Exception as e:
                     return jsonify({'success': False, 'error': f'Failed to process background photo: {str(e)}'}), 500
             else:
