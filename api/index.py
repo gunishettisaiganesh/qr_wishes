@@ -46,22 +46,23 @@ app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Helper to upload file to Pixeldrain
-def upload_to_pixeldrain(file_io, filename):
+# Helper to upload file to Telegraph (Telegra.ph)
+def upload_to_telegraph(file_io, filename):
     try:
         response = requests.post(
-            'https://pixeldrain.com/api/file',
+            'https://telegra.ph/upload',
             files={'file': (filename, file_io.read())},
             timeout=15
         )
-        if response.status_code == 201:
+        if response.status_code == 200:
             data = response.json()
-            file_id = data.get('id')
-            if file_id:
-                return f"https://pixeldrain.com/api/file/{file_id}", None
+            if isinstance(data, list) and len(data) > 0 and 'src' in data[0]:
+                return f"https://telegra.ph{data[0]['src']}", None
+            else:
+                return None, f"Unexpected response format: {data}"
         return None, f"HTTP {response.status_code}: {response.text}"
     except Exception as e:
-        print(f"Error uploading to pixeldrain: {e}")
+        print(f"Error uploading to telegraph: {e}")
         return None, str(e)
 
 # Base64 Encoding & Decoding Helpers
@@ -145,8 +146,8 @@ def api_generate():
                     img.save(img_io, 'JPEG', quality=85)
                     img_io.seek(0)
                     
-                    # Upload to Pixeldrain
-                    uploaded_url, upload_err = upload_to_pixeldrain(img_io, filename)
+                    # Upload to Telegraph
+                    uploaded_url, upload_err = upload_to_telegraph(img_io, filename)
                     if not uploaded_url:
                         return jsonify({'success': False, 'error': f'Failed to upload friend photo to remote storage: {upload_err}'}), 500
                     friend_photo_path = uploaded_url
@@ -180,8 +181,8 @@ def api_generate():
                     img.save(img_io, 'JPEG', quality=85)
                     img_io.seek(0)
                     
-                    # Upload to Pixeldrain
-                    uploaded_url, upload_err = upload_to_pixeldrain(img_io, filename)
+                    # Upload to Telegraph
+                    uploaded_url, upload_err = upload_to_telegraph(img_io, filename)
                     if not uploaded_url:
                         return jsonify({'success': False, 'error': f'Failed to upload background photo to remote storage: {upload_err}'}), 500
                     bg_photo_path = uploaded_url
