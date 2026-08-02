@@ -46,25 +46,22 @@ app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Helper to upload file to Catbox.moe
-def upload_to_catbox(file_io, filename):
+# Helper to upload file to Pixeldrain
+def upload_to_pixeldrain(file_io, filename):
     try:
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        }
         response = requests.post(
-            'https://catbox.moe/user/api.php',
-            data={'reqtype': 'fileupload'},
-            files={'fileToUpload': (filename, file_io.read())},
-            headers=headers,
+            'https://pixeldrain.com/api/file',
+            files={'file': (filename, file_io.read())},
             timeout=15
         )
-        if response.status_code == 200:
-            return response.text.strip(), None
-        else:
-            return None, f"HTTP {response.status_code}: {response.text}"
+        if response.status_code == 201:
+            data = response.json()
+            file_id = data.get('id')
+            if file_id:
+                return f"https://pixeldrain.com/api/file/{file_id}", None
+        return None, f"HTTP {response.status_code}: {response.text}"
     except Exception as e:
-        print(f"Error uploading to catbox: {e}")
+        print(f"Error uploading to pixeldrain: {e}")
         return None, str(e)
 
 # Base64 Encoding & Decoding Helpers
@@ -148,8 +145,8 @@ def api_generate():
                     img.save(img_io, 'JPEG', quality=85)
                     img_io.seek(0)
                     
-                    # Upload to Catbox
-                    uploaded_url, upload_err = upload_to_catbox(img_io, filename)
+                    # Upload to Pixeldrain
+                    uploaded_url, upload_err = upload_to_pixeldrain(img_io, filename)
                     if not uploaded_url:
                         return jsonify({'success': False, 'error': f'Failed to upload friend photo to remote storage: {upload_err}'}), 500
                     friend_photo_path = uploaded_url
@@ -183,8 +180,8 @@ def api_generate():
                     img.save(img_io, 'JPEG', quality=85)
                     img_io.seek(0)
                     
-                    # Upload to Catbox
-                    uploaded_url, upload_err = upload_to_catbox(img_io, filename)
+                    # Upload to Pixeldrain
+                    uploaded_url, upload_err = upload_to_pixeldrain(img_io, filename)
                     if not uploaded_url:
                         return jsonify({'success': False, 'error': f'Failed to upload background photo to remote storage: {upload_err}'}), 500
                     bg_photo_path = uploaded_url
