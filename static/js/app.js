@@ -280,7 +280,7 @@ function initWishGenerator() {
         e.preventDefault();
         
         // Basic checks
-        if (!friendNameInput.value || !senderNameInput.value || !messageInput.value) {
+        if (!friendNameInput.value || !senderNameInput.value || !messageInput.value || !bdayDateInput.value || !ageInput.value) {
             showToast("Please fill in all required fields (*)", "error");
             return;
         }

@@ -13,7 +13,7 @@
     <!-- Wish CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/wish.css') }}?v=1.0.2">
 </head>
-<body class="wish-body theme-{{ wish.theme }}" {% if wish.background %} style="background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.6)), url('{{ wish.background }}'); background-size: cover; background-position: center;" {% endif %}>
+<body class="wish-body theme-{{ wish.theme }}">
     
     <!-- Canvas for Confetti and Fireworks -->
     <canvas id="confetti-canvas"></canvas>
@@ -49,7 +49,7 @@
 
     <!-- STEP 2: The Greeting Card (Revealed after gift box click) -->
     <div class="surprise-card-wrapper" id="surprise-card-wrapper">
-        <div class="surprise-card glass-container">
+        <div class="surprise-card glass-container" {% if wish.background %} style="background: linear-gradient(rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.55)), url('{{ wish.background }}') no-repeat center center !important; background-size: cover !important;" {% endif %}>
             <div class="cake-graphic">🎂✨</div>
             
             <h1 style="font-weight: 800; font-size: 2.2rem; line-height: 1.2;">

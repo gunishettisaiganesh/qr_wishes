@@ -3,6 +3,7 @@
 {% block title %}Surprise Birthday Card Ready! - QR Wishes{% endblock %}
 
 {% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/wish.css') }}?v=1.0.2">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/result.css') }}">
 {% endblock %}
 
@@ -72,13 +73,48 @@
 
     <!-- Print Template Section (Hidden on Screen, visible on print via media queries) -->
     <div class="print-card-area" style="display: none;">
-        <div style="border: 2px dashed #999; padding: 40px; border-radius: 16px; text-align: center; max-width: 400px; margin: 40px auto; font-family: 'Poppins', sans-serif;">
-            <h2 style="font-size: 1.6rem; font-weight: 700; margin-bottom: 10px;">Scan For a Surprise!</h2>
-            <p style="font-size: 0.9rem; color: #555; margin-bottom: 25px;">Happy Birthday, {{ wish.friend_name }}!</p>
-            <div style="border: 1px solid #ccc; padding: 15px; display: inline-block; border-radius: 12px; background: white; margin-bottom: 25px;">
-                <img src="{{ wish.qr_image }}" style="width: 180px; height: 180px;" alt="Birthday QR">
+        <div class="surprise-card theme-{{ wish.theme }}" {% if wish.background %} style="background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.65)), url('{{ wish.background }}') no-repeat center center !important; background-size: cover !important;" {% endif %}>
+            
+            <div class="cake-graphic">🎂✨</div>
+            
+            <h1 style="font-weight: 800; font-size: 2rem; line-height: 1.2; text-align: center;">
+                Happy Birthday, <br><span id="target-friend-name">{{ wish.friend_name }}</span>!
+            </h1>
+
+            {% if wish.age %}
+            <div style="font-size: 1.15rem; font-weight: 700; margin-top: -10px; text-align: center;">
+                Celebrating {{ wish.age }} Awesome Years!
             </div>
-            <p style="font-size: 0.8rem; color: #777;">Designed with QR Wishes<br>qrwishes.com</p>
+            {% endif %}
+
+            <!-- Photo Frame (Polaroid mockup) -->
+            <div class="polaroid-frame" style="transform: none; margin: 15px auto;">
+                {% if wish.photo %}
+                <img src="{{ wish.photo }}" alt="{{ wish.friend_name }}">
+                {% else %}
+                <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&width=200&auto=format&fit=crop" alt="Celebration balloons">
+                {% endif %}
+                <div class="caption" style="color: #333;">Wishing you the best! ❤️</div>
+            </div>
+
+            <!-- Greeting message -->
+            <p class="wish-message" style="font-style: italic; text-align: center; margin: 15px 0;">
+                "{{ wish.message }}"
+            </p>
+
+            <div class="wish-sender" style="text-align: center;">
+                With Love & Wishes,<br>
+                <span style="font-size: 1.15rem; font-weight: 700; color: var(--accent);">{{ wish.sender_name }}</span>
+            </div>
+
+            <!-- Scan QR section inside card -->
+            <div class="print-qr-section" style="margin-top: 25px; padding-top: 20px; border-top: 1px dashed rgba(255,255,255,0.25); text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; print-color-adjust: exact !important; -webkit-print-color-adjust: exact !important;">
+                <p style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.9;">Scan to see digital page & play music! 🎁</p>
+                <div style="background: white; padding: 10px; border-radius: 10px; display: inline-block;">
+                    <img src="{{ wish.qr_image }}" style="width: 120px; height: 120px; display: block;" alt="Birthday QR">
+                </div>
+                <p style="font-size: 0.65rem; opacity: 0.7; margin-top: 2px;">Designed with qrwishes.com</p>
+            </div>
         </div>
     </div>
 </div>

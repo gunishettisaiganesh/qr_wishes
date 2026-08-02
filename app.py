@@ -71,8 +71,8 @@ def api_generate():
         music = request.form.get('music', 'happy-birthday')
         
         # Validation
-        if not friend_name or not sender_name or not message:
-            return jsonify({'success': False, 'error': 'Friend Name, Sender Name, and Birthday Message are required.'}), 400
+        if not friend_name or not sender_name or not message or not birthday_date or not age:
+            return jsonify({'success': False, 'error': 'Friend Name, Sender Name, Birthday Date, Age Reaching, and Birthday Message are required.'}), 400
         
         # Handle Uploads
         friend_photo_path = None
@@ -85,9 +85,28 @@ def api_generate():
         if friend_photo and friend_photo.filename != '':
             if allowed_file(friend_photo.filename):
                 filename = secure_filename(f"{file_hash}_friend_{friend_photo.filename}")
+                filename_base, _ = os.path.splitext(filename)
+                filename = f"{filename_base}.jpg"
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                friend_photo.save(file_path)
-                friend_photo_path = f"/static/uploads/{filename}"
+                
+                try:
+                    img = Image.open(friend_photo.stream)
+                    # Convert to RGB (in case of RGBA/PNG)
+                    if img.mode in ('RGBA', 'LA'):
+                        background = Image.new('RGB', img.size, (255, 255, 255))
+                        background.paste(img, mask=img.split()[3])
+                        img = background
+                    elif img.mode != 'RGB':
+                        img = img.convert('RGB')
+                    
+                    # Resize preserving aspect ratio (limit to max 600px width/height)
+                    img.thumbnail((600, 600), Image.Resampling.LANCZOS)
+                    
+                    # Save as compressed JPEG
+                    img.save(file_path, 'JPEG', quality=85)
+                    friend_photo_path = f"/static/uploads/{filename}"
+                except Exception as e:
+                    return jsonify({'success': False, 'error': f'Failed to process friend photo: {str(e)}'}), 500
             else:
                 return jsonify({'success': False, 'error': 'Invalid format for friend photo. Allowed formats: PNG, JPG, JPEG, GIF, WEBP.'}), 400
 
@@ -95,9 +114,28 @@ def api_generate():
         if bg_photo and bg_photo.filename != '':
             if allowed_file(bg_photo.filename):
                 filename = secure_filename(f"{file_hash}_bg_{bg_photo.filename}")
+                filename_base, _ = os.path.splitext(filename)
+                filename = f"{filename_base}.jpg"
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                bg_photo.save(file_path)
-                bg_photo_path = f"/static/uploads/{filename}"
+                
+                try:
+                    img = Image.open(bg_photo.stream)
+                    # Convert to RGB (in case of RGBA/PNG)
+                    if img.mode in ('RGBA', 'LA'):
+                        background = Image.new('RGB', img.size, (255, 255, 255))
+                        background.paste(img, mask=img.split()[3])
+                        img = background
+                    elif img.mode != 'RGB':
+                        img = img.convert('RGB')
+                    
+                    # Resize: limit dimensions to maximum of 1200px maintaining aspect ratio
+                    img.thumbnail((1200, 1200), Image.Resampling.LANCZOS)
+                    
+                    # Save as compressed JPEG
+                    img.save(file_path, 'JPEG', quality=85)
+                    bg_photo_path = f"/static/uploads/{filename}"
+                except Exception as e:
+                    return jsonify({'success': False, 'error': f'Failed to process background photo: {str(e)}'}), 500
             else:
                 return jsonify({'success': False, 'error': 'Invalid format for background photo. Allowed formats: PNG, JPG, JPEG, GIF, WEBP.'}), 400
 
@@ -139,7 +177,13 @@ def result(data_string):
             'id': data_string,
             'friend_name': payload.get('fn'),
             'sender_name': payload.get('sn'),
+            'message': payload.get('msg'),
+            'age': payload.get('age'),
+            'birthday_date': payload.get('date'),
             'theme': payload.get('theme'),
+            'music': payload.get('music'),
+            'photo': payload.get('photo'),
+            'background': payload.get('bg'),
             'wish_link': f"{request.host_url}wish/{data_string}",
             'qr_image': f"/api/qr/{data_string}"
         }

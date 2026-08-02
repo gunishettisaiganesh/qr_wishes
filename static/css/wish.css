@@ -1,9 +1,10 @@
 /* Wish Page - Themed Surprises stylesheet */
 
 .wish-body {
-    background-attachment: fixed;
-    background-size: cover;
-    background-repeat: no-repeat;
+    background-attachment: fixed !important;
+    background-size: cover !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -515,4 +516,141 @@
 
 .wish-actions-flex .btn {
     flex: 1;
+}
+
+/* --- UNIQUE CARD FORMATTING CONSTRAINTS --- */
+.polaroid-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: white;
+    padding: 12px 12px 24px 12px;
+    border-radius: 8px;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+    width: 230px !important;
+    margin: 15px auto;
+    align-self: center;
+}
+
+.polaroid-frame img {
+    width: 100%;
+    height: 196px;
+    object-fit: contain; /* Display the entire uploaded image fully and properly without cropping */
+    background-color: #fafafa;
+    border: 1px solid #eee;
+    border-radius: 4px;
+}
+
+/* Constrain greeting card wrapper for uniform appearance */
+.surprise-card-wrapper {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.surprise-card {
+    padding: 30px 24px;
+    gap: 20px;
+    max-height: 85vh; /* Keep card within viewport dimensions */
+    overflow-y: auto; /* Allow reading long messages in card without expanding indefinitely */
+}
+
+/* --- PRINT MEDIA RULES FOR WISH PAGE --- */
+@media print {
+    body {
+        background: none !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        display: block !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    /* Hide non-card elements completely */
+    #confetti-canvas,
+    #fireworks-canvas,
+    .music-toggle-container,
+    #wish-config,
+    .gift-wrapper,
+    .wish-actions-flex,
+    .sparkle {
+        display: none !important;
+    }
+    
+    /* Center and format surprise card wrapper for print */
+    .surprise-card-wrapper {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: none !important;
+        position: relative !important;
+        width: 100% !important;
+        max-width: 390px !important; /* Slightly more compact card width for print */
+        margin: 10px auto !important;
+        padding: 0 !important;
+        page-break-inside: avoid !important;
+        page-break-before: avoid !important;
+        break-inside: avoid !important;
+    }
+    
+    .surprise-card {
+        border: 2px dashed #999999 !important;
+        border-radius: 16px !important;
+        box-shadow: none !important;
+        padding: 20px 24px !important; /* Reduced padding to save height */
+        gap: 12px !important; /* Tightened element gap to fit one page */
+        max-height: none !important;
+        overflow: visible !important;
+        print-color-adjust: exact !important;
+        -webkit-print-color-adjust: exact !important;
+    }
+    
+    .surprise-card * {
+        text-shadow: none !important;
+        visibility: visible !important;
+    }
+    
+    .surprise-card h1 {
+        font-size: 1.6rem !important;
+        margin-bottom: 5px !important;
+    }
+    
+    .surprise-card h1 span {
+        font-size: 1.8rem !important;
+    }
+    
+    .polaroid-frame {
+        border: 1px solid #cccccc !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        transform: none !important; /* Remove tilt for perfect print alignment */
+        width: 180px !important; /* Scaled down polaroid width to save height */
+        padding: 8px 8px 16px 8px !important; /* Reduced padding */
+        margin: 8px auto !important;
+    }
+    
+    .polaroid-frame img {
+        border: 1px solid #dddddd !important;
+        width: 100% !important;
+        height: 140px !important; /* Scaled down height to fit one page */
+        object-fit: contain !important;
+    }
+    
+    .wish-message {
+        font-size: 0.95rem !important;
+        line-height: 1.4 !important;
+        margin: 6px 0 !important;
+    }
+    
+    .print-qr-section img {
+        width: 90px !important; /* Scaled down QR code image for single-page printing */
+        height: 90px !important;
+    }
+    
+    .cake-graphic {
+        animation: none !important;
+        font-size: 2.2rem !important;
+        margin-bottom: 5px !important;
+    }
 }
