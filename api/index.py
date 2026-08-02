@@ -58,6 +58,10 @@ def decode_data(b64_str):
 
 # --- ROUTES ---
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return f"Flask 404 error: path was {request.path}. Raw path: {request.environ.get('PATH_INFO')}", 404
+
 @app.route('/')
 def index():
     return render_template('index.html')
