@@ -25,6 +25,23 @@ try:
 except Exception as e:
     print(f"Warning: Could not create upload folder (read-only filesystem on Vercel): {e}")
 
+# WSGI Middleware to fix Vercel path rewrites
+class VercelPathFixMiddleware(object):
+    def __init__(self, app_wsgi):
+        self.app_wsgi = app_wsgi
+
+    def __call__(self, environ, start_response):
+        from urllib.parse import parse_qs, urlencode
+        query_string = environ.get('QUERY_STRING', '')
+        params = parse_qs(query_string)
+        if '__path__' in params:
+            original_path = params.pop('__path__')[0]
+            environ['PATH_INFO'] = original_path
+            environ['QUERY_STRING'] = urlencode(params, doseq=True)
+        return self.app_wsgi(environ, start_response)
+
+app.wsgi_app = VercelPathFixMiddleware(app.wsgi_app)
+
 # Helper function to check file type
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
@@ -57,12 +74,6 @@ def decode_data(b64_str):
     return json.loads(json_bytes.decode('utf-8'))
 
 # --- ROUTES ---
-
-@app.errorhandler(404)
-def page_not_found(e):
-    headers_dict = dict(request.headers)
-    headers_str = json.dumps(headers_dict, indent=2)
-    return f"Flask 404 error: path was {request.path}. Raw path: {request.environ.get('PATH_INFO')}. Headers:\n{headers_str}", 404
 
 @app.route('/')
 def index():
