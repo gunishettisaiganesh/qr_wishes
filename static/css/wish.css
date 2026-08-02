@@ -419,3 +419,81 @@
     50% { opacity: 0.7; }
     100% { transform: translateY(-10vh) scale(1.5); opacity: 0; }
 }
+
+/* --- RESPONSIVENESS (Media Queries) --- */
+
+@media (max-width: 480px) {
+    .wish-body {
+        padding: 12px;
+        align-items: flex-start; /* Avoid cutting off card content on short screens */
+        overflow-y: auto;
+    }
+    
+    .surprise-card-wrapper {
+        margin-top: 50px; /* Space for the floating music button */
+        margin-bottom: 30px;
+    }
+    
+    .surprise-card {
+        padding: 24px 16px;
+        gap: 18px;
+        border-radius: 16px;
+    }
+    
+    .surprise-card h1 {
+        font-size: 1.7rem !important;
+    }
+    
+    .polaroid-frame {
+        width: 180px;
+        padding: 10px 10px 20px 10px;
+    }
+    
+    .polaroid-frame .caption {
+        font-size: 0.8rem;
+        margin-top: 6px;
+    }
+    
+    .wish-message {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+    
+    .celebration-countdown {
+        padding: 10px;
+        gap: 8px;
+    }
+    
+    .countdown-number {
+        font-size: 1.1rem;
+    }
+    
+    .countdown-label {
+        font-size: 0.6rem;
+    }
+    
+    .music-toggle-container {
+        top: 15px;
+        right: 15px;
+    }
+    
+    .music-btn-floating {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 360px) {
+    .surprise-card h1 {
+        font-size: 1.5rem !important;
+    }
+    
+    .polaroid-frame {
+        width: 160px;
+    }
+    
+    .wish-message {
+        font-size: 0.9rem;
+    }
+}
